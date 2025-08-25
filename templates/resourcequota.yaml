@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: quota-{{TENANT_NAME}}
+  namespace: {{TENANT_NAME}}
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: "4Gi"
+    requests.storage: "10Gi"
+    pods: "10"

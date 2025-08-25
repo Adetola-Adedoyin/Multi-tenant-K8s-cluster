@@ -1,0 +1,23 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{TENANT_NAME}}
+  name: tenant-admin
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "deployments", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "create", "update", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: tenant-admin-binding
+  namespace: {{TENANT_NAME}}
+subjects:
+- kind: User
+  name: {{TENANT_USER}}
+roleRef:
+  kind: Role
+  name: tenant-admin
+  apiGroup: rbac.authorization.k8s.io
