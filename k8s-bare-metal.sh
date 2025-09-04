@@ -49,6 +49,36 @@ sudo apt-get update
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 
+#Enable bridge-nf-call-iptables
+#This allows iptables to see bridged traffic (required for Calico/Flannel).
+
+sudo modprobe br_netfilter
+echo "br_netfilter" | sudo tee /etc/modules-load.d/br_netfilter.conf
+
+sudo sysctl -w net.bridge.bridge-nf-call-iptables=1
+sudo sysctl -w net.bridge.bridge-nf-call-ip6tables=1
+
+#To make it persistent across reboots:
+
+sudo tee /etc/sysctl.d/k8s.conf <<EOF
+net.bridge.bridge-nf-call-iptables  = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.ipv4.ip_forward                 = 1
+EOF
+
+sudo sysctl --system
+
+# Enable IPv4 forwarding
+
+sudo sysctl -w net.ipv4.ip_forward=1
+
+# Verify settings
+
+cat /proc/sys/net/bridge/bridge-nf-call-iptables
+cat /proc/sys/net/ipv4/ip_forward
+
+#both should return 1
+
 # Initialize the cluster (on master node):
 
 sudo kubeadm init --pod-network-cidr=10.244.0.0/16 
